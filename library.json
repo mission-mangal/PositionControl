@@ -11,21 +11,16 @@
     "authors":
     [
       {
-        "name": "Samrat Chhabra",
-        "email": "me@john-smith.com",
-        "url": "https://marsiiitdmk.netlify.app/team/"
+        "name": "MaRS IIITDM Kancheepuram",
+        "email": "mars@iiitdm.ac.in",
+        "url": "https://marsiiitdmk.netlify.app/"
       },
-      {
-        "name": "Vishal Kumar",
-        "email": "me@andrew-smith.com",
-        "url": "https://www.viku.co.in",
-        "maintainer": true
-      }
+
     ],
     "license": "MIT",
-    "homepage": "https://marsiiitdmk.netlify.app/",
+    "homepage": "https://www.linkedin.com/company/mars-research-station/",
     "dependencies": {
-      "ownername/print": "~1.3.0"
+      "ownername/print": "~1.0.1"
     },
     "frameworks": "*",
     "platforms": "*"
