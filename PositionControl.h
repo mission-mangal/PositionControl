@@ -17,7 +17,7 @@ private:
   bool polarity_reverse = false;
 
   //Motor Related Parameters
-  double CPR = 36124;
+  long CPR = 36124;
   float motorRadius = 1; // in metres
   float maxSpeed = 2.0; // Rotation Per Second
 
@@ -119,6 +119,8 @@ public:
   void setCPR(int cpr)
   {
     CPR = cpr;
+    Serial.println("CPR");
+    Serial.println(CPR);
   }
 
   void setMotorMaxSpeed(float speed)
@@ -129,27 +131,41 @@ public:
   void setAngle(float theta)
   {
     // input: motor speed in rotation per second
-    setPoint = int((theta/360) * CPR);
+    setPoint = long((theta* CPR)/360);
   }
 
   float getAngle()
   {
-    return ((encoder->read()/CPR) * 360);
+    return ((encoder->read()* 360)/double(CPR));
   }
 
   void controlLoop()
   { 
   currentPosition = encoder->read();
   pid.run();
-  if ((setPoint * (1.0 - tolerance) < currentPosition) && (setPoint * (1 + tolerance) > currentPosition))
-    {
-      setMotorPWM( 0);
-      Serial.println("Reached the target");
-    }
+  if (setPoint <0)
+
+        if ((setPoint * (1.0 - tolerance) > currentPosition) && (setPoint * (1 + tolerance) < currentPosition))
+        {
+          setMotorPWM( 0);
+          // Serial.println("Reached the target");
+        }
+      else
+        {
+          setMotorPWM(outputPWM);
+        }
+
   else
-    {
-      setMotorPWM(outputPWM);
-    }
+
+      if ((setPoint * (1.0 - tolerance) < currentPosition) && (setPoint * (1 + tolerance) > currentPosition))
+        {
+          setMotorPWM( 0);
+          // Serial.println("Reached the target");
+        }
+      else
+        {
+          setMotorPWM(outputPWM);
+        }
   
   }
 
