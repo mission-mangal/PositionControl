@@ -116,7 +116,7 @@ public:
     pid.setOutputRange(outputMin , outputMax);
   }
 
-  void setCPR(int cpr)
+  void setCPR(long cpr)
   {
     CPR = cpr;
     Serial.println("CPR");
