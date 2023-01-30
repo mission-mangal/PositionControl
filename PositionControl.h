@@ -17,7 +17,7 @@ private:
   bool polarity_reverse = false;
 
   //Motor Related Parameters
-  long CPR = 36124;
+  
   float motorRadius = 1; // in metres
   float maxSpeed = 2.0; // Rotation Per Second
 
@@ -32,6 +32,7 @@ private:
 public: 
   //Velocity control related parameters
   double currentPosition;
+  long CPR = 36124;
   double setPoint = 0;
   double outputPWM= 0;
   double tolerance = 0.1;
@@ -145,7 +146,7 @@ public:
   pid.run();
   if (setPoint <0)
 
-        if ((setPoint * (1.0 - tolerance) > currentPosition) && (setPoint * (1 + tolerance) < currentPosition))
+        if (((setPoint  + (tolerance*CPR)) > currentPosition) && ((setPoint  - (tolerance*CPR))) < currentPosition)
         {
           setMotorPWM( 0);
           // Serial.println("Reached the target");
@@ -157,7 +158,7 @@ public:
 
   else
 
-      if ((setPoint * (1.0 - tolerance) < currentPosition) && (setPoint * (1 + tolerance) > currentPosition))
+      if (((setPoint - (tolerance*CPR)) < currentPosition) && ((setPoint  + (tolerance*CPR)) > currentPosition))
         {
           setMotorPWM( 0);
           // Serial.println("Reached the target");
