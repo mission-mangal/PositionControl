@@ -16,60 +16,57 @@ private:
   uint8_t encB;
   bool polarity_reverse = false;
 
-  //Motor Related Parameters
-  
+  // Motor Related Parameters
+
   float motorRadius = 1; // in metres
-  float maxSpeed = 2.0; // Rotation Per Second
+  float maxSpeed = 2.0;  // Rotation Per Second
 
   // PID Control Related Parameter
-  double outputMin  = -50;
+  double outputMin = -50;
   double outputMax = 50;
-  float kP  = 0.1;
-  float kI  = 0.03;
-  float kD  = 0.02;
+  float kP = 0.1;
+  float kI = 0.03;
+  float kD = 0.02;
 
-
-public: 
-  //Velocity control related parameters
+public:
+  // Velocity control related parameters
   double currentPosition;
   long CPR = 36124;
   double setPoint = 0;
-  double outputPWM= 0;
+  double outputPWM = 0;
   double tolerance = 0.1;
 
   // double * position;
   AutoPID pid{&currentPosition, &setPoint, &outputPWM, outputMin, outputMax, kP, kI, kD};
-  Encoder * encoder;
-  
-  void  initialSetup()
+  Encoder *encoder;
+
+  void initialSetup()
   {
-  // Setting the pin configurations
-  pinMode(dirPin, OUTPUT);
-  pinMode(pwmPin, OUTPUT);
-  digitalWrite(dirPin , LOW);
-  analogWrite(pwmPin , 0);
-  delay(2000);
-  //variables for velocity calculation
-  setPoint  = 0.0;
-  currentPosition = 0;
-  outputPWM  = 0;
+    // Setting the pin configurations
+    pinMode(dirPin, OUTPUT);
+    pinMode(pwmPin, OUTPUT);
+    digitalWrite(dirPin, LOW);
+    analogWrite(pwmPin, 0);
+    delay(2000);
+    // variables for velocity calculation
+    setPoint = 0.0;
+    currentPosition = 0;
+    outputPWM = 0;
   }
 
   PositionControl()
   {
     // params:  direction pin , pwm pin , encoder A , encoder B
-   
   }
 
-  void setPin(uint8_t pinDir , uint8_t pinPWM ,uint8_t aEnc , uint8_t bEnc )
+  void setPin(uint8_t pinDir, uint8_t pinPWM, uint8_t aEnc, uint8_t bEnc)
   {
-  dirPin = pinDir;
-  pwmPin = pinPWM;
-  encA  = aEnc;
-  encB = bEnc;
-  encoder  =  new Encoder(encA , encB);
-  initialSetup();
-
+    dirPin = pinDir;
+    pwmPin = pinPWM;
+    encA = aEnc;
+    encB = bEnc;
+    encoder = new Encoder(encA, encB);
+    initialSetup();
   }
 
   ~PositionControl()
@@ -90,31 +87,31 @@ public:
 
   void setMotorPWM(int PWM)
   {
-  if (polarity_reverse)
-    PWM = PWM * -1;
+    if (polarity_reverse)
+      PWM = PWM * -1;
     // Changing the motor direction based on the PWM value
-  if (PWM < 0)
-      digitalWrite(dirPin , LOW);
-  else 
-      digitalWrite(dirPin , HIGH);
+    if (PWM < 0)
+      digitalWrite(dirPin, LOW);
+    else
+      digitalWrite(dirPin, HIGH);
 
-  // generating the PWM pulses for changing the motor velocity
-    analogWrite(pwmPin , abs(PWM));
+    // generating the PWM pulses for changing the motor velocity
+    analogWrite(pwmPin, abs(PWM));
   }
 
-  void setPIDValue(float p , float i , float d )
+  void setPIDValue(float p, float i, float d)
   {
     kP = p;
     kI = i;
     kD = d;
-    pid.setGains(kP, kI , kD);
+    pid.setGains(kP, kI, kD);
   }
 
-  void setPIDOutput(int min , int max)
+  void setPIDOutput(int min, int max)
   {
     outputMin = min;
     outputMax = max;
-    pid.setOutputRange(outputMin , outputMax);
+    pid.setOutputRange(outputMin, outputMax);
   }
 
   void setCPR(long cpr)
@@ -132,45 +129,42 @@ public:
   void setAngle(float theta)
   {
     // input: motor speed in rotation per second
-    setPoint = long((theta* CPR)/360);
+    setPoint = long((theta * CPR) / 360);
   }
 
   float getAngle()
   {
-    return ((encoder->read()* 360)/double(CPR));
+    return ((encoder->read() * 360) / double(CPR));
   }
 
   void controlLoop()
-  { 
-  currentPosition = encoder->read();
-  pid.run();
-  if (setPoint <0)
+  {
+    currentPosition = encoder->read();
+    pid.run();
+    if (setPoint < 0)
+    {
+      if (((setPoint + (tolerance * CPR)) > currentPosition) && ((setPoint - (tolerance * CPR))) < currentPosition)
+      {
+        outputPWM = 0;
+        setPoint = encoder->read();
+        pid.stop();
+        // Serial.println("Reached the target");
+      }
 
-        if (((setPoint  + (tolerance*CPR)) > currentPosition) && ((setPoint  - (tolerance*CPR))) < currentPosition)
-        {
-          setMotorPWM( 0);
-          // Serial.println("Reached the target");
-        }
-      else
-        {
-          setMotorPWM(outputPWM);
-        }
+      setMotorPWM(outputPWM);
+    }
+    else
+    {
+      if (((setPoint - (tolerance * CPR)) < currentPosition) && ((setPoint + (tolerance * CPR)) > currentPosition))
+      {
+        outputPWM = 0;
+        setPoint = encoder->read();
+        pid.stop();
+        // Serial.println("Reached the target");
+      }
 
-  else
-
-      if (((setPoint - (tolerance*CPR)) < currentPosition) && ((setPoint  + (tolerance*CPR)) > currentPosition))
-        {
-          setMotorPWM( 0);
-          // Serial.println("Reached the target");
-        }
-      else
-        {
-          setMotorPWM(outputPWM);
-        }
-  
-  }
-
-
-};
+      setMotorPWM(outputPWM);
+    }
+  };
 
 #endif
