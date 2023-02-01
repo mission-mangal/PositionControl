@@ -1,7 +1,7 @@
 #include "PositionControl.h"
 #include <Arduino.h>
 
-MotorControl motor1;
+PositionControl motor1;
 
 #define dirPin 9
 #define pwmPin 8
