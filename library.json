@@ -1,6 +1,6 @@
 {
     "name": "PositionControl ",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "This is a library aiming at implementing pid control to control the position of a DC motor with feedback from quadrature encoder. It is a multifunctional  program with extra feature of tuning the gain parameters and very useful for robotic enthusiast in wheeled robots",
     "keywords": "DC motor, control system, PID , position control , speed control with feedback, arduino motor position control , teensy position control",
     "repository":
