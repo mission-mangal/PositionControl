@@ -165,6 +165,7 @@ public:
 
       setMotorPWM(outputPWM);
     }
+  }
   };
 
 #endif
